@@ -1,38 +1,77 @@
-<?php 
+<?php
 
-$input = floatval($argv[1]);
-define("geld",[
-    100,
-    50,
-    20,
-    10,
-    5,
-    2,
-    1,
-]);
-$input2 = floatval($argv[1]) * 100;
-$input2 = substr($input2, -2,2);
-define("geldt",[
-    50,
-    20,
-    10,
-    5]
-);
-round($input, 5);
-round($input2, 5);
-foreach (geld as $geldvalue ){
-    if (floor($input / $geldvalue) > 0) {
-        $amount = floor($input / $geldvalue);
-        echo $amount . " x " . $geldvalue . " euro" . PHP_EOL;
-        $input = $input - ($amount * $geldvalue);  
+$input = $argv[1];
+$bedrag = floatval($input);
+$restbedrag = $bedrag;
+
+check($restbedrag);
+function check($restbedrag){
+    echo !is_numeric($restbedrag);
+    try{
+        if(!is_numeric($restbedrag) || $restbedrag == "" || $restbedrag == null) {
+            throw new Exception("Je hebt geen bedrag meegegeven dat omgewisseld kan worden");
+        }
+        if($restbedrag <= 0) {
+            throw new Exception("ik kan geen negatief bedrag wisselen");
+        }
+        $restbedrag = euros($restbedrag) * 100;
+        cents($restbedrag);
+    }
+    catch(Exception $e){
+   echo $e->getMessage();
     }
 }
 
-foreach (geldt as $geldvalue){
-    if(floor($input2 / $geldvalue) > 0) {
-        $amount2 = round($input2 / $geldvalue);
-        echo $amount2 . " x " . $geldvalue . " cent" . PHP_EOL;
-        $input2 = $input2 - ($amount2 * $geldvalue);  
+
+
+
+
+
+
+
+function euros($restbedrag){
+    define(
+        "GELDEENHEDEN", 
+        [
+        500,
+        200,
+        100,
+        50,
+        20,
+        10,
+        5,
+        2,
+        1
+        ]
+    ); 
+    foreach(GELDEENHEDEN as $euro){
+        define(
+            "CENTEN",
+            [
+            50,
+            20,
+            10,
+            5
+            ]
+        );
+        if($restbedrag>=$euro) {
+            $aantalKeerEuroInRestBedrag = floor($restbedrag / $euro);
+            $restbedrag = $restbedrag - $euro * $aantalKeerEuroInRestBedrag;
+            echo($aantalKeerEuroInRestBedrag. " X " .$euro. " euro".PHP_EOL);
+        }
+    }
+    return $restbedrag;
 }
+
+
+function cents($restbedrag){
+    foreach(CENTEN as $euro){
+        if($restbedrag>=$euro) {
+            $aantalKeerEuroInRestBedrag = floor($restbedrag / $euro);
+            $restbedrag = round($restbedrag - $euro * $aantalKeerEuroInRestBedrag);
+            echo($aantalKeerEuroInRestBedrag. " X " .$euro. " cent".PHP_EOL);
+        }
+    }
 }
-?> 
+
+?>
